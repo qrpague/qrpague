@@ -1,0 +1,378 @@
+swagger: '2.0'
+info:
+  description: >-
+    O Saque Digital é implementado com a utilização da tecnologia de QRCode e
+    pode ser implementado entre duas instituições distintas, sendo elas
+    financeiras ou não. Esta API implementa o processo de autorização e
+    confirmação do Saque Digital, que ocorrem online.
+  version: 1.0.0
+  title: Saque Digital Interinstituição
+  termsOfService: 'http://swagger.io/terms/'
+  contact:
+    email: dev@sicoob.com.br
+host: <<api-manager-produca>>.sicoob.com.br
+schemes:
+  - https
+paths:
+  '/saque-digital/{uuid}':
+    get:
+      tags:
+        - recuperarSaque
+      summary: Endpoit para recuperar informações de um saque.
+      description: >-
+        Este endpoint deve ser implementado pela instituição sacadora para
+        devolver as informações complementares de um saque identificado pelo
+        parâmetro uuid para a instituição sacada.
+      operationId: saque-recuperar
+      security:
+        - OAuth2: []
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: uuid
+          description: Identificador único do saque na instituição sacadora.
+          required: true
+          type: string
+          pattern: >-
+            ^(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}$
+        - $ref: '#/parameters/cnpjInstituicao'
+      responses:
+        '200':
+          description: Requisição realizada com sucesso
+          schema:
+            $ref: '#/definitions/InformacaoSaque'
+        '400':
+          description: Exceção de negócio
+          schema:
+            $ref: '#/definitions/ErroNegocio'
+        '500':
+          description: Erro interno no servidor
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+  /saque-digital/autorizar:
+    post:
+      tags:
+        - autorizarSaque
+      summary: Endpoit para autorizar um saque.
+      description: >-
+        Este endpoint deve ser implementado pela instituição sacadora para
+        receber a autorização de um saque da instituição sacada.
+      operationId: saque-autorizar
+      security:
+        - OAuth2: []
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          description: Autorização do saque.
+          required: true
+          schema:
+            $ref: '#/definitions/AutorizacaoSaque'
+        - $ref: '#/parameters/cnpjInstituicao'
+      responses:
+        '200':
+          description: Requisição realizada com sucesso
+          schema:
+            $ref: '#/definitions/OKNegocio'
+        '400':
+          description: Exceção de negócio
+          schema:
+            $ref: '#/definitions/ErroNegocio'
+        '500':
+          description: Erro interno no servidor
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+  /saque-digital/confirmar:
+    post:
+      tags:
+        - confirmarSaque
+      summary: Endpoit para confirmar um saque.
+      description: >-
+        Este endpoint deve ser implementado pela instituição sacada para receber
+        a confirmação de um saque da instituição sacadora.
+      operationId: saque-confirmar
+      security:
+        - OAuth2: []
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/cnpjInstituicao'
+        - name: body
+          in: body
+          description: Confirmação do saque.
+          required: true
+          schema:
+            $ref: '#/definitions/ConfirmacaoSaque'
+      responses:
+        '200':
+          description: Confirmação realizada com sucesso
+        '400':
+          description: Exceção de negócio
+          schema:
+            $ref: '#/definitions/ErroNegocio'
+        '500':
+          description: Erro interno no servidor
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+securityDefinitions:
+  OAuth2:
+    type: oauth2
+    flow: application
+    tokenUrl: https://example.com/oauth/token
+    scopes: {}
+parameters:
+  cnpjInstituicao:
+    in: header
+    name: cnpjInstituicao
+    description: >-
+      CNPJ Matriz da instituição que está confirmando o saque, sem os dígitos
+        de filial e verificador.
+    type: number
+    format: integer
+    required: true
+definitions:
+  InformacaoSaque:
+    type: object
+    properties:
+      uuid:
+        type: string
+        pattern: >-
+          ^(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}$
+        description: Identificador único do saque na instituição sacadora. RFC 4122
+        example: 3d0ca315-aff9–4fc2-be61–3b76b9a2d798
+      dataHoraSolicitacaoSaque:
+        type: string
+        format: date-time
+        description: >-
+          Data e hora da solicitação do saque na instituição sacadora. Formato
+          RFC 3339, seção 5.6.
+        example: '2017-07-21T17:32:28Z'
+      idTerminal:
+        type: string
+        description: Identificador único do terminal na rede da instituição sacadora.
+        example: 0001128322332
+      UFTerminal:
+        type: string
+        pattern: '^[A-Z]{2}$'
+        description: >-
+          Sigla da Unidade Federativa do terminal onde o saque está sendo
+          solicitado.
+        example: DF
+      CEPTerminal:
+        type: string
+        pattern: '^[0-9]{5}-[0-9]{3}$'
+        description: CEP do endereço do terminal onde está sendo solicitado o saque.
+        example: 70000-000
+      latitudeTerminal:
+        type: number
+        format: double
+        description: Latitude em graus do terminal onde está sendo solicitado o saque.
+        example: '-15.7801'
+      longitudeTerminal:
+        type: number
+        format: double
+        description: Longitude em graus do terminal onde está sendo solicitado o saque.
+        example: '-47.9292'
+      urlAutorizacao:
+        type: string
+        description: >-
+          URL de callback que a instituição sacada deverá chamar para autorizar
+          o saque. Formato: http://[basepath]/saque-digital/autorizar.
+        example: 'http://api.tecban.com.br/saque-digital/autorizar'
+    required:
+      - uuid
+      - dataHoraSolicitacaoSaque
+      - idTerminal
+      - UFTerminal
+      - CEPTerminal
+      - urlAutorizacao
+  AutorizacaoSaque:
+    type: object
+    properties:
+      saqueAutorizado:
+        type: boolean
+        description: Saque autorizado (true). Saque não autorizado (false).
+        example: true
+      uuid:
+        type: string
+        pattern: >-
+          ^(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}$
+        description: >-
+          Identificador único do saque na instituição sacadora. Recuperado
+          através do QRCode e validado pelo endpoint /saque-digital/{uuid}.
+        example: 3d0ca315-aff9–4fc2-be61–3b76b9a2d798
+      agenciaOrigem:
+        description: Numero da Agencia Origem
+        type: string
+        minLength: 4
+        maxLength: 4
+        example: '0123'
+      contaOrigem:
+        description: Numero da Conta Origem
+        type: string
+        minLength: 10
+        maxLength: 10
+        example: 0123456789
+      nomeOrigem:
+        description: Nome do Cliente Origem
+        type: string
+        minLength: 0
+        maxLength: 40
+        example: Alberto Roberto
+      cpfCnpjOrigem:
+        description: >-
+          Numero do CPF ou CNPJ do Cliente Origem (incluindo digito verificador,
+          sem separador)
+        type: string
+        minLength: 11
+        maxLength: 14
+        example: '12345678999'
+      dataHoraAutorizacao:
+        type: string
+        format: date-time
+        description: >-
+          Data e hora da autorização do saque na instituição sacada. Formato RFC
+          3339, seção 5.6.
+        example: '2017-07-21T17:32:28Z'
+      valorAutorizado:
+        type: number
+        format: integer
+        description: 'Valor de saque autorizado, incluindo centavos (sem separador).'
+        example: '20000'
+      urlConfirmacao:
+        type: string
+        description: >-
+          URL de callback que a instituição sacadora deverá chamar para
+          confirmar a efetivação do saque na instituição sacada. Formato:
+          http://[basepath]/saque-digital/confirmar.
+        example: 'http://api.sicoob.com.br/saque-digital/confirmar'
+      mensagemIDP:
+        description: Mensagem para solicitar ao usuario um codigo de confirmacao (IDP)
+        type: string
+        minLength: 0
+        maxLength: 80
+        example: Digite os três primeiros digitos de seu CPF
+      tamanhoIDP:
+        description: >-
+          Quantidade de caracteres do codigo de confirmacao do saque a ser
+          digitado pelo usuario (IDP)
+        type: integer
+        format: int32
+        minimum: 1
+        exclusiveMinimum: false
+        maximum: 16
+        exclusiveMaximum: false
+        example: 11
+      urlIDP:
+        description: >-
+          URL para pedir validacao do codigo de confirmacao digitado pelo
+          usuario (IDP).
+        type: string
+        minLength: 10
+        maxLength: 2048
+        example: 'http://api.sicoob.com.br/saque-digital/idp'
+      codMotivo:
+        type: number
+        format: integer
+        minimum: 0
+        maximum: 99
+        description: >-
+          Código do motivo da não autorização do saque, quando este não for
+          autorizado.
+      mensagem:
+        type: string
+        description: >-
+          Mensagem opcional com motivo da não autorização do saque, quando este
+          não for autorizado.
+        example: null
+    required:
+      - saqueAutorizado
+      - uuid
+      - dataHoraAutorizacao
+      - valorAutorizado
+      - urlConfirmacao
+  ConfirmacaoSaque:
+    type: object
+    properties:
+      saqueEfetivado:
+        type: boolean
+        description: Saque efetivado (true). Saque não efetivado (false).
+        example: true
+      uuid:
+        type: string
+        pattern: >-
+          ^(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}$
+        description: >-
+          Identificador único do saque na instituição sacadora. Recuperado
+          através do QRCode e validado pelo endpoint /saque-digital/{uuid}.
+        example: 3d0ca315-aff9–4fc2-be61–3b76b9a2d798
+      dataHoraEfetivacao:
+        type: string
+        format: date-time
+        description: >-
+          Data e hora da geração do QRCode no terminal. Formato RFC 3339, seção
+          5.6.
+        example: '2017-07-21T17:32:28Z'
+      dataReferencia:
+        description: Data de referência da transação no formato yyyy-mm-dd.
+        type: string
+        format: date-time
+        example: '2016-12-19'
+      valorEfetivado:
+        type: number
+        format: integer
+        description: 'Valor de saque efetivado, incluindo centavos (sem separador).'
+        example: '20000'
+      codMotivo:
+        type: number
+        format: integer
+        minimum: 0
+        maximum: 99
+        description: >-
+          Código do motivo da não confirmação do saque, quando este não for
+          autorizado.
+      mensagem:
+        type: string
+        description: >-
+          Mensagem opcional com motivo da não efetivação do saque, quando este
+          não for efetivado.
+        example: null
+    required:
+      - saqueEfetivado
+      - uuid
+      - dataHoraEfetivacao
+      - valorEfetivado
+  ErroNegocio:
+    type: object
+    properties:
+      codigoErro:
+        type: number
+        format: integer
+        description: Código de erro de negócio.
+        example: 1
+      mensagemErro:
+        type: string
+        description: Mensagem de erro de negócio.
+        example: QRCode inválido.
+      dataReferencia:
+        description: Data hora de referência da transação no formato RFC 3339, seção 5.6.
+        type: string
+        format: date-time
+        example: '2017-07-21T17:32:28Z'
+    required:
+      - codigoErro
+      - mensagemErro
+  OKNegocio:
+    type: object
+    properties:
+      dataReferencia:
+        description:  Data hora de referência da transação no formato RFC 3339, seção 5.6.
+        type: string
+        format: date-time
+        example: '2017-07-21T17:32:28Z'
