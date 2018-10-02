@@ -275,8 +275,6 @@ definitions:
         example: 'PAGO'
       terminal:
         $ref: '#/definitions/Terminal'
-      terminalEfetivacao:
-        $ref: '#/definitions/Terminal'
       favorecido:
         type: object
         properties:
@@ -399,8 +397,6 @@ definitions:
         description: >-
           Situação da operação financeira digital realizada.
         example: 'PAGO'
-      terminalEfetivacao:
-        $ref: '#/definitions/Terminal'
   ErroNegocio:
     type: object
     properties:
