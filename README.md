@@ -8,7 +8,7 @@ Projeto para a padronização de código QR entre as instituições financeiras 
 
 ## Escopo
 
-O padrão QRPAGUE poderá ser utilizado para os mais diferentes propósitos. Da transferência interbancária ao pagamento de tributos. Por meio do mobile banking onde possuem conta seus usuários poderão realizar transferências, pagar contas no comércio, pagar tributos, comprar pela interneto de seu desktop ou celular de forma simplificada.
+O padrão QRPAGUE poderá ser utilizado para os mais diferentes propósitos. Da transferência interbancária ao pagamento de tributos. Por meio do mobile banking da sua instituição financeira, seus usuários poderão realizar transferências, pagar contas no comércio, pagar tributos, comprar pela internet de seu desktop ou celular de forma simplificada.
 
 ## Funcionamento
 
