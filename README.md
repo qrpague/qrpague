@@ -16,13 +16,13 @@ O padrão QRPAGUE poderá ser utilizado para os mais diferentes propósitos. Da 
   <img src="https://raw.githubusercontent.com/qrpague/qrpague/master/imagens/QRPague-Funcionamento.png" width="500" title="Fluxo simplificado.">
 </p>
 
-Por meio da padronização de APIs entre as instituições financeiras espera-se viabilizar a possibilidade de popularização e populariação  deste padrão.
+Por meio da padronização de APIs entre as instituições financeiras, espera-se viabilizar a popularização do padrão.
 
 ## Segurança
 
-Ao abordar a questão de segurança, no que tange a segurança das API's RESFTful o padrão QRPAGUE busca trabalhar dentro das principais recomendações da OWASP. Uma das primeiras recomendações é a utilização de HTTPS, visando proteger as informações senssíveis de acesso não autorizado através do uso de SSL/TLS. Também vislumbra a utilização de headers de segurança, validações de content-type e autenticação utilizando fluxos do OAuth 2.0.
+Ao abordar a questão de segurança, no que tange a segurança das API's RESFTful, o padrão QRPAGUE busca trabalhar dentro das principais recomendações da OWASP. Uma das primeiras recomendações é a utilização de HTTPS, visando proteger as informações sensíveis de acesso não autorizado, através do uso de SSL/TLS. Também vislumbra a utilização de headers de segurança, validações de content-type e autenticação utilizando fluxos do OAuth 2.0.
 
-Complementar ao descrito àcima, a comunicação só poderá ocorrer entre instituições financeiras autorizadas. As chaves públicas dessas instituições estarão disponíveis entre elas com a finalidade de permitir verificar a integridade das informações assinadas que são trocadas nas operações financeiras. 
+Complementar ao descrito acima, a comunicação só poderá ocorrer entre instituições financeiras autorizadas. As chaves públicas dessas instituições estarão disponíveis entre elas com a finalidade de permitir verificar a integridade das informações assinadas que são trocadas nas operações financeiras. 
 
 ## Content-type
 
