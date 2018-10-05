@@ -24,6 +24,10 @@ Ao abordar a questão de segurança, no que tange a segurança das API's RESFTfu
 
 Complementar ao descrito acima, a comunicação só poderá ocorrer entre instituições financeiras autorizadas. Para garantir a segurança e a integridade das operações o padrão QRPague prevê que todos os objetos trafegados pela instituição emissora sejam assinados e encriptados. Todas as chaves públicas serão disponibilizadas pelos emissores e disponibilizadas na pasta “chaves” deste projeto com o respectivo domínio como nome. 
 
-## Content-type
+## Leitura do QRCode
 
-(..) "application/qrpague"
+Um dos objetivos da solução QRPAGUE é que a partir da leitura do QRCode fornecido pela instituição financeira seja possível abrir o aplicativo mobile bank desejado pelo usuário para tratar a operação financeira digital. Para esse objetivo será possível utilizar as definições de scheme já utilizado para as soluções mobile e a leitura de um content type customizado que permitirá o usuário do mobile selecionar um aplicativo para tratar tal finalidade.
+
+### Content/type
+
+Mesmo que as informações trafegadas sejam objetos JSON, existe a possibilidade de tratá-lo como um content type customizado para que o dispositivo mobile consiga prover para o usuário opções de aplicativos instalados que conseguem efetuar sua leitura. Para tal, os objetos JSON trafegados para as operações financeiras serão vinculadas ao content type "application/qrpague".
