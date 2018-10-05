@@ -32,7 +32,7 @@ Um dos objetivos da solução QRPAGUE é que a partir da leitura do QRCode forne
 
 Mesmo que as informações trafegadas sejam objetos JSON, existe a possibilidade de tratá-lo como um content type customizado para que o dispositivo mobile consiga prover para o usuário opções de aplicativos instalados que conseguem efetuar sua leitura. Para tal, os objetos JSON trafegados para as operações financeiras serão vinculadas ao content type "application/qrpague".
 
-## A APIs RESTful
+## A API RESTful
 
 Os endpoints para tratar as operações de geração dos QRCodes está conforme o conjunto de operações abaixo. A documentação complenta a API pode ser vista [aqui](http://editor.swagger.io?url=https://raw.githubusercontent.com/qrpague/qrpague/master/swagger.yaml).
 
