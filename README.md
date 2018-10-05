@@ -26,7 +26,7 @@ Complementar ao descrito acima, a comunicação só poderá ocorrer entre instit
 
 ## Leitura do QRCode
 
-Um dos objetivos da solução QRPAGUE é que a partir da leitura do QRCode fornecido pela instituição financeira seja possível abrir o aplicativo mobile bank desejado pelo usuário para tratar a operação financeira digital. Para esse objetivo será possível utilizar as definições de scheme já utilizado para as soluções mobile e a leitura de um content type customizado que permitirá o usuário do mobile selecionar um aplicativo para tratar tal finalidade.
+Um dos objetivos da solução QRPAGUE é que a partir da leitura do QRCode fornecido pela instituição financeira seja possível abrir o aplicativo mobile banking desejado pelo usuário para tratar a operação financeira digital. Para esse objetivo será possível utilizar um content type customizado que permitirá o usuário do mobile selecionar um aplicativo para tratar tal finalidade.
 
 ### Content/type
 
