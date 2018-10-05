@@ -148,7 +148,7 @@ paths:
           name: operacao-financeira
           required: true
           schema:
-            $ref: '#/definitions/OperacaoFinanceiraPart'
+            $ref: '#/definitions/OperacaoFinanceira'
         - $ref: '#/parameters/cnpjInstituicao'
       responses:
         '200':
@@ -157,6 +157,11 @@ paths:
             $ref: '#/definitions/OperacaoFinanceira'
         '400':
           description: Exceção de negócio
+          schema:
+            $ref: '#/definitions/ErroNegocio'
+        '406':
+          description: >-
+            Exceção de negócio quando atualização de status da operação não for feita corretamente.
           schema:
             $ref: '#/definitions/ErroNegocio'
         '500':
@@ -191,30 +196,32 @@ definitions:
         description: >-
           Links de possíveis ações a serem realiazadas do resultado vindo de uma consulta de operações financeiras.
         items:
-          type: object
-          properties:
-            url:
-              type: string
-              description: >-
-                Código do produto ou serviço para o cliente do QRCode emitido.
-              example: <<api.dominio.com.br>>/qrpague/operacoes?paginaInicial=2&tamanhoPagina=20
-            descricao:
-              type: string
-              description: >-
-                Descricao do link.
-              example: próxima pagina
-            metodoHttp:
-              type: string
-              enum: [POST, GET, PUT, DELETE]
-              description: >-
-                Método http aplicado à URL espeficidas.
-              example: GET
+          $ref: '#/definitions/Link'
       resultados:
         type: array
         description: >-
           Conjunto de operações financeiras digitais recuperadas a partir dos parâmetros de filtragem informados.
         items:
           $ref: '#/definitions/OperacaoFinanceira'
+  Link:
+    type: object
+    properties:
+      url:
+        type: string
+        description: >-
+          Código do produto ou serviço para o cliente do QRCode emitido.
+        example: <<api.dominio.com.br>>/qrpague/operacoes?paginaInicial=2&tamanhoPagina=20
+      descricao:
+        type: string
+        description: >-
+          Descricao do link.
+        example: próxima pagina
+      metodoHttp:
+        type: string
+        enum: [POST, GET, PUT, DELETE]
+        description: >-
+          Método http aplicado à URL espeficidas.
+        example: GET
   OperacaoFinanceira:
     type: object
     properties:
@@ -276,62 +283,11 @@ definitions:
       terminal:
         $ref: '#/definitions/Terminal'
       favorecido:
-        type: object
-        properties:
-          nome:
-            type: string
-            description: >-
-              Nome do favorecido na operação financeira digital.
-            example: 'Meu escritório de advogados'
-          cpfCnpj:
-            description: >-
-              Numero do CPF ou CNPJ do Favorecido da operação financeira digital (incluindo digito verificador, sem separador)
-            type: string
-            minLength: 11
-            maxLength: 14
-            example: '12345678999'
-          instituicao:
-            type: string
-            description: >-
-              ISQN da instituição do favorecido na operação financeira digital.
-            example: '12345678999'
+        $ref: '#/definitions/Favorecido'
       itens: 
         type: array
         items:
-          type: object
-          properties:
-            descricao48:
-              type: string
-              description: >-
-                Descrição do produto para impressora de 48 posições.
-            descricaoCompleta:
-              type: string
-              description: >-
-                Descrição completa do produto ou serviço consumido.
-            codigo:
-              type: string
-              description: >-
-                Código do produto ou serviço para o cliente do QRCode emitido.
-            quantidade:
-              type: integer
-              description: >-
-                Quantaide de itens do produto ou serviço integrante da operação financeira digital.
-            valorunitario:
-              type: integer
-              description: >-
-                Valor unitário do produto ou serviço integrante da operação financeira digital.
-            desconto:
-              type: integer
-              description: >-
-                Desconto aplicado ao total do valor da operação financeira digital referente aos seus itens.
-            total:
-              type: integer
-              description: >-
-                Total do valor dos itens participantes da operação financeira digital referente do QRCode gerado.
-            urlthumbimg:
-              type: string
-              description: >-
-                URL da imagem do item participante da operação financeira digital referente do QRCode gerado.
+          $ref: '#/definitions/Item'  
         description: >-
           Itens participantes de uma da operação financeira digital gerado para um QRCode.
     required:
@@ -344,6 +300,61 @@ definitions:
       - tipoOperacao
       - terminal
       - favorecido
+  Favorecido:
+    type: object
+    properties:
+      nome:
+        type: string
+        description: >-
+          Nome do favorecido na operação financeira digital.
+        example: 'Meu escritório de advogados'
+      cpfCnpj:
+        description: >-
+          Numero do CPF ou CNPJ do Favorecido da operação financeira digital (incluindo digito verificador, sem separador)
+        type: string
+        minLength: 11
+        maxLength: 14
+        example: '12345678999'
+      instituicao:
+        type: string
+        description: >-
+          ISQN da instituição do favorecido na operação financeira digital.
+        example: '12345678999'  
+  Item:
+    type: object
+    properties:
+      descricao48:
+        type: string
+        description: >-
+          Descrição do produto para impressora de 48 posições.
+      descricaoCompleta:
+        type: string
+        description: >-
+          Descrição completa do produto ou serviço consumido.
+      codigo:
+        type: string
+        description: >-
+          Código do produto ou serviço para o cliente do QRCode emitido.
+      quantidade:
+        type: integer
+        description: >-
+          Quantaide de itens do produto ou serviço integrante da operação financeira digital.
+      valorunitario:
+        type: integer
+        description: >-
+          Valor unitário do produto ou serviço integrante da operação financeira digital.
+      desconto:
+        type: integer
+        description: >-
+          Desconto aplicado ao total do valor da operação financeira digital referente aos seus itens.
+      total:
+        type: integer
+        description: >-
+          Total do valor dos itens participantes da operação financeira digital referente do QRCode gerado.
+      urlthumbimg:
+        type: string
+        description: >-
+          URL da imagem do item participante da operação financeira digital referente do QRCode gerado.
   Terminal:
     type: object
     properties:
@@ -382,21 +393,6 @@ definitions:
         description: >-
           Longitude em graus do terminal onde está sendo solicitado o saque.
         example: '-47.9292'
-  OperacaoFinanceiraPart:
-    type: object
-    properties:
-      dataHoraEfetivacao:
-        type: string
-        format: date-time
-        description: >-
-          Data e hora de efetivacao da operação financeira na instituição financeira. Formato RFC 3339, seção 5.6.
-        example: '2017-07-21T17:32:28Z'
-      situacao:
-        type: string
-        enum: ["EMITIDO", "PAGO", "CANCELADO"]
-        description: >-
-          Situação da operação financeira digital realizada.
-        example: 'PAGO'
   ErroNegocio:
     type: object
     properties:
