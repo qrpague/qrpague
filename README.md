@@ -20,9 +20,9 @@ Por meio da padronização de APIs entre as instituições financeiras, espera-s
 
 ## Segurança
 
-Ao abordar a questão de segurança, no que tange a segurança das API's RESFTful, o padrão QRPAGUE busca trabalhar dentro das principais recomendações da OWASP. Uma das primeiras recomendações é a utilização de HTTPS, visando proteger as informações sensíveis de acesso não autorizado, através do uso de SSL/TLS. Também vislumbra a utilização de headers de segurança, validações de content-type e autenticação utilizando fluxos do OAuth 2.0.
+Ao abordar a questão de segurança, no que tange a segurança das API's RESFTful, o padrão QRPAGUE busca trabalhar dentro das principais recomendações da OWASP. Uma das primeiras recomendações é a utilização de HTTPS, visando proteger as informações sensíveis de acesso não autorizado, através do uso de SSL/TLS. Também vislumbra a utilização de headers de segurança e validações de content-type.
 
-Complementar ao descrito acima, a comunicação só poderá ocorrer entre instituições financeiras autorizadas. As chaves públicas dessas instituições estarão disponíveis entre elas com a finalidade de permitir verificar a integridade das informações assinadas que são trocadas nas operações financeiras. 
+Complementar ao descrito acima, a comunicação só poderá ocorrer entre instituições financeiras autorizadas. Para garantir a segurança e a integridade das operações o padrão QRPague prevê que todos os objetos trafegados pela instituição emissora sejam assinados e encriptados. Todas as chaves públicas serão disponibilizadas pelos emissores e disponibilizadas na pasta “chaves” deste projeto com o respectivo domínio como nome. 
 
 ## Content-type
 
