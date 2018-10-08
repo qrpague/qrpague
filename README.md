@@ -36,9 +36,10 @@ Mesmo que as informações trafegadas sejam objetos JSON, existe a possibilidade
 
 Os endpoints para tratar as operações de geração dos QRCodes está conforme o conjunto de operações abaixo. A documentação complenta a API pode ser vista [aqui](http://editor.swagger.io?url=https://raw.githubusercontent.com/qrpague/qrpague/master/swagger.yaml).
 
-| Operação |      Endpoint     |  Descrição                                          |
-|:---------|:------------------|:---------------------------------------------------:|
-| POST     | /operacao         | Endpoit para gerar um QRCode de operação financeira digital através do padrão QRPAGUE. |
-| GET      | /operacoes        | Endpoit para recuperar informações de operações financeiras digitais gerada através do QRPAGUE. |
-| GET      | /operacoes/{uuid} | Endpoit para consultar informações de uma operação financeira digital gerada através do QRPAGUE. |
-| PUT      | /operacoes/{uuid} | Endpoit para atualizar informações de uma operação financeira digital gerada através do QRPAGUE. |
+| Operação |      Endpoint                 |  Descrição                                          |
+|:---------|:------------------            |:---------------------------------------------------:|
+| POST     | /operacao                     | Endpoit para gerar um QRCode de operação financeira digital através do padrão QRPAGUE. |
+| GET      | /operacoes                    | Endpoit para recuperar informações de operações financeiras digitais gerada através do QRPAGUE. |
+| GET      | /operacoes/{uuid}             | Endpoit para consultar informações de uma operação financeira digital gerada através do QRPAGUE. |
+| POST     | /operacoes/{uuid}/confirmacao | Endpoit para receber a confirmação de execução com sucesso de uma operação financeira digital gerada através do QRPAGUE. |
+| POST     | /operacoes/{uuid}/autorizacao | Endpoit para autorizar uma operação financeira digital gerada através do QRPAGUE. |
