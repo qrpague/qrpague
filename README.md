@@ -41,5 +41,5 @@ Os endpoints para tratar as operações de geração dos QRCodes está conforme 
 | POST     | /operacao                     | Endpoit para gerar um QRCode de operação financeira digital através do padrão QRPAGUE. |
 | GET      | /operacoes                    | Endpoit para recuperar informações de operações financeiras digitais gerada através do QRPAGUE. |
 | GET      | /operacoes/{uuid}             | Endpoit para consultar informações de uma operação financeira digital gerada através do QRPAGUE. |
-| POST     | /operacoes/{uuid}/confirmacao | Endpoit para receber a confirmação de execução com sucesso de uma operação financeira digital gerada através do QRPAGUE. |
 | POST     | /operacoes/{uuid}/autorizacao | Endpoit para autorizar uma operação financeira digital gerada através do QRPAGUE. |
+| POST     | /operacoes/{uuid}/confirmacao | Endpoit para receber a confirmação de execução com sucesso de uma operação financeira digital gerada através do QRPAGUE. |
