@@ -16,7 +16,7 @@ O padrão QRPAGUE poderá ser utilizado para os mais diferentes propósitos. Da 
   <img src="https://raw.githubusercontent.com/qrpague/qrpague/master/imagens/QRPague-Funcionamento.png" width="500" title="Fluxo simplificado.">
 </p>
 
-Por meio da padronização de APIs entre as instituições financeiras, espera-se viabilizar a popularização do padrão.
+Por meio da padronização de APIs as instituições financeiras poderão emitir operações a receber de terceiros. Essas operações poderão ser de difrentes propósitos. Utilizando um API idêntica as diferentes instituições envolvidas (emissora e pagadora) poderá se comunicar diretamente entre seus servidores. Tornando o processo seguro e simples.
 
 ## Segurança
 
@@ -35,7 +35,6 @@ Mesmo que as informações trafegadas sejam objetos JSON, existe a possibilidade
 ## A API RESTful
 
 Os endpoints para tratar as operações de geração dos QRCodes está conforme o conjunto de operações abaixo. A documentação complenta a API pode ser vista [aqui](http://editor.swagger.io?url=https://raw.githubusercontent.com/qrpague/qrpague/master/swagger.yaml).
-
 
 | Operação |      Endpoint     |  Descrição                                          |
 |:---------|:------------------|:---------------------------------------------------:|
