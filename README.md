@@ -1,4 +1,4 @@
-# qrpague
+# Padrão QRPague
 
 Projeto para a padronização de código QR entre as instituições financeiras brasileiras para permitir uma melhor experiência de seus usuários de mobile banking. A solução, toda baseada na padronização de APIs entre os participantes do ecossistema financeiro nacional, permitirá uma nova experiência no varejo, comércio eletrônico, mobile commerce, transferência digital, pagamento de taxas e tributos. Por meio da sua adoção espera-se manter a posição brasileira de nação com sistema financeiro moderno e forte.
 
