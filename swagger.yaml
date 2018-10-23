@@ -253,7 +253,8 @@ paths:
             $ref: '#/definitions/MensagemRetorno'
         '406':
           description: >-
-            Exceção de negócio quando atualização de status da operação não for feita corretamente.
+            Exceção de negócio quando atualização de status da operação não for
+            feita corretamente.
           schema:
             $ref: '#/definitions/MensagemRetorno'
         '500':
@@ -289,7 +290,8 @@ definitions:
       links:
         type: array
         description: >-
-          Links de possíveis ações a serem realizadas no resultado vindo de uma consulta de operações financeiras.
+          Links de possíveis ações a serem realizadas no resultado vindo de uma
+          consulta de operações financeiras.
         items:
           $ref: '#/definitions/Link'
       resultados:
@@ -313,7 +315,7 @@ definitions:
       descricao:
         type: string
         description: Descrição do link.
-        example: 'próxima pagina'
+        example: próxima pagina
       metodoHttp:
         type: string
         enum:
@@ -359,7 +361,7 @@ definitions:
       descricao:
         type: string
         description: Descrição da operação financeira realizada.
-        example: 'Pagamento do serviço de Advocacia na Meu escritório de advogados.'
+        example: Pagamento do serviço de Advocacia na Meu escritório de advogados.
       dataHoraSolicitacao:
         type: string
         format: date-time
@@ -381,12 +383,20 @@ definitions:
           Data e hora de efetivação da operação financeira na instituição
           financeira. Formato RFC 3339, seção 5.6.
         example: '2017-07-21T17:32:28Z'
+      codigoBarras:
+        type: string
+        description: >-
+          Código de barras de 44 dígitos numéricos, para boletos de títulos ou
+          convênios, sem espaçadores, pontos ou traços.
+        example: '12345678912123456781231234567812312345678912'
       tipoOperacao:
         type: string
         enum:
           - SAQUE
-          - TRANSFERÊNCIA
+          - TRANSFERENCIA
           - PAGAMENTO
+          - TITULO
+          - CONVENIO
         description: Tipo da operação financeira digital realizada.
         example: PAGAMENTO
       situacao:
@@ -408,7 +418,8 @@ definitions:
         items:
           $ref: '#/definitions/Item'
         description: >-
-          Itens participantes de uma da operação financeira digital gerado para um QRCode.
+          Itens participantes de uma da operação financeira digital gerado para
+          um QRCode.
       confirmacaoOperacao:
         $ref: '#/definitions/ConfirmacaoOperacao'
       autorizacaoOperacao:
@@ -416,7 +427,6 @@ definitions:
     required:
       - versao
       - cnpjInstituicao
-      - uuid
       - valor
       - dataHoraSolicitacao
       - situacao
@@ -429,11 +439,11 @@ definitions:
       nome:
         type: string
         description: Nome do beneficiário na operação financeira digital.
-        example: 'Meu escritório de advogados'
+        example: Meu escritório de advogados
       cpfCnpj:
         description: >-
           Numero do CPF ou CNPJ do Beneficiário da operação financeira digital
-          (incluindo digito verificador, sem separador)
+          (incluindo dígito verificador, sem separador)
         type: string
         minLength: 11
         maxLength: 14
@@ -441,7 +451,9 @@ definitions:
       instituicao:
         type: string
         description: >-
-          ISQN da instituição do beneficiário na operação financeira digital. Número composto pelos primeiros 8 dígitos do CPNJ da instituição financeira.
+          ISQN da instituição do beneficiário na operação financeira digital.
+          Número composto pelos primeiros 8 dígitos do CPNJ da instituição
+          financeira.
         example: '01234567'
       agencia:
         type: string
@@ -480,15 +492,17 @@ definitions:
       descricao48:
         type: string
         description: Descrição do produto para impressora de 48 posições.
-        example: 'Desc resumida produto'
+        example: Desc resumida produto
       descricaoCompleta:
         type: string
         description: Descrição completa do produto ou serviço consumido.
-        example: 'Descrição mais detalhada do produto que pode extrapolar as 48 posições da descrição resumida.'
+        example: >-
+          Descrição mais detalhada do produto que pode extrapolar as 48 posições
+          da descrição resumida.
       codigo:
         type: string
         description: Código do produto ou serviço para o cliente do QRCode emitido.
-        example: 'xpto-4851-3327'
+        example: xpto-4851-3327
       quantidade:
         type: integer
         description: >-
@@ -498,25 +512,29 @@ definitions:
       valorUnitario:
         type: integer
         description: >-
-          Valor unitário do produto ou serviço integrante da operação financeira digital onde os últimos 2 dígitos representam as casas decimais.
+          Valor unitário do produto ou serviço integrante da operação financeira
+          digital onde os últimos 2 dígitos representam as casas decimais.
         example: 75000
       desconto:
         type: integer
         description: >-
           Desconto aplicado ao total do valor da operação financeira digital
-          referente aos seus itens onde os últimos 2 dígitos representam as casas decimais.
+          referente aos seus itens onde os últimos 2 dígitos representam as
+          casas decimais.
         example: 3500
       total:
         type: integer
         description: >-
-          Total do valor dos itens participantes da operação financeira digital referente do QRCode gerado onde os últimos 2 dígitos representam as casas decimais.
+          Total do valor dos itens participantes da operação financeira digital
+          referente do QRCode gerado onde os últimos 2 dígitos representam as
+          casas decimais.
         example: 71500
       urlThumbImg:
         type: string
         description: >-
           URL da imagem do item participante da operação financeira digital
           referente do QRCode gerado.
-        example: '<<dominiocliente.com.br>>/prod35/img1.jpg'
+        example: <<dominiocliente.com.br>>/prod35/img1.jpg
     required:
       - descricaoCompleta
       - quantidade
