@@ -31,7 +31,7 @@ paths:
       security:
         - OAuth2: []
       produces:
-        - application/json
+        - application/qrpague
       parameters:
         - in: body
           name: operacao-financeira
@@ -68,7 +68,7 @@ paths:
       security:
         - OAuth2: []
       produces:
-        - application/json
+        - application/qrpague
       parameters:
         - $ref: '#/parameters/cnpjInstituicao'
         - in: query
@@ -134,7 +134,7 @@ paths:
       security:
         - OAuth2: []
       produces:
-        - application/json
+        - application/qrpague
       parameters:
         - in: path
           name: uuid
@@ -174,7 +174,7 @@ paths:
       security:
         - OAuth2: []
       produces:
-        - application/json
+        - application/qrpague
       parameters:
         - in: path
           name: uuid
@@ -225,7 +225,7 @@ paths:
       security:
         - OAuth2: []
       produces:
-        - application/json
+        - application/qrpague
       parameters:
         - in: path
           name: uuid
