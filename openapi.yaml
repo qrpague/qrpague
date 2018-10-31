@@ -1,0 +1,738 @@
+openapi: 3.0.0
+info:
+  description: >-
+    A solução QRPague utiliza as tecnologias de QRCode e API para implementar
+    operações financeiras de saque, pagamentos e transferência entre
+    instituições distintas, sendo elas financeiras ou não. Esta API fornece um
+    conjunto de serviços de emissão, autorização e confirmação de operações
+    financeiras online. O uso das APIs deve obedecer os fluxos de processo
+    disponíveis no GitHub do projeto para cada natureza de operação (saque,
+    transferência ou pagamento).
+  version: 1.0.0
+  title: Operações Digitais QRPague
+  termsOfService: 'http://swagger.io/terms/'
+  contact:
+    email: dev@sicoob.com.br
+servers:
+  - url: https://<<api.dominio.com.br>>/qrpague
+paths:
+  /operacao:
+    post:
+      tags:
+        - Operações Financeiras Digitais
+      summary: Endpoit para gerar um QRCode de operação financeira digital.
+      description: >-
+        Este endpoint deve ser implementado pela instituição financeira para que
+        um cliente/beneficiário possa solicitar a geração de um QRCode para uma
+        operação financeira digital.
+      operationId: operacao-financeira-criar
+      security:
+        - OAuth2: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/OperacaoFinanceira'
+                - $ref: '#/components/schemas/CodigoBarras'
+      responses:
+        '200':
+          description: Imagem do QRCode gerado a partir do mecanismo do QRPAGUE.
+          content:
+            image:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: Exceção de negócio
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MensagemRetorno'
+        '500':
+          description: Erro interno no servidor
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+  /operacoes:
+    get:
+      tags:
+        - Operações Financeiras Digitais
+      summary: >-
+        Endpoit para recuperar informações de operações financeiras digitais
+        através da url QRPAGUE codifica no QRCode gerado pela instituição
+        cedente.
+      description: >-
+        Este endpoint deve ser implementado pela instituição financeira para
+        devolver as informações complementares de uma operação financeira
+        digital gerada através da solução QRPague pelo parâmetro uuid.
+      operationId: operacao-financeira-recuperar
+      security:
+        - OAuth2: []
+      parameters:
+        - $ref: '#/components/parameters/cnpjInstituicao'
+        - in: query
+          name: cpfCnpjBeneficiario
+          description: >-
+            Especificação do CPF ou CPNJ do beneficiário das operações
+            financeiras digitais sem barras e pontos.
+          required: true
+          schema:
+            type: string
+            minLength: 11
+            maxLength: 14
+        - in: query
+          name: paginaInicial
+          description: >-
+            Especificação de uma página inicial para consulta de operações
+            financeiras digitais.
+          schema:
+            type: integer
+        - in: query
+          name: tamanhoPagina
+          description: >-
+            Especificação de um tamanho de página para consulta de operações
+            financeiras digitais.
+          schema:
+            type: integer
+        - in: query
+          name: periodoInicio
+          description: >-
+            Data de início de período da emissão das operações financeiras
+            digitais para filtragem. RFC 3339, Exemplo: 2017-07-21.
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: periodoFim
+          description: >-
+            Data final de período da emissão das operações financeiras digitais
+            para filtragem. RFC 3339, Exemplo: 2017-07-21.
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Requisição realizada com sucesso
+          content:
+            application/qrpague:
+              schema: 
+                $ref: '#/components/schemas/ConsultaOperacaoFinanceira'
+        '400':
+          description: Exceção de negócio
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MensagemRetorno'
+        '500':
+          description: Erro interno no servidor
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+  '/operacoes/{uuid}':
+    get:
+      tags:
+        - Operações Financeiras Digitais
+      summary: >-
+        Endpoit para consultar informações de uma operação financeira digital
+        (Transferência, Saque ou Pagamento) gerada através do QRPAGUE.
+      description: >-
+        Este endpoint deve ser implementado pela instituição financeira para
+        recuperar as informações de uma operação financeira digital
+        (Transferência, Saque ou Pagamento) identificada pelo UUID passado como
+        parâmetro. 
+      operationId: operacao-financeira-consultar
+      security:
+        - OAuth2: []
+      parameters:
+        - in: path
+          name: uuid
+          description: >-
+            Identificador único da operação financeira na instituição financeira
+            que gerou o QRCode.
+          required: true
+          schema:
+            type: string
+            pattern: >-
+              ^(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}$
+        - $ref: '#/components/parameters/cnpjInstituicao'
+      responses:
+        '200':
+          description: Requisição realizada com sucesso
+          content:
+            application/qrpague:
+              schema:
+                $ref: '#/components/schemas/OperacaoFinanceira'
+        '400':
+          description: Exceção de negócio
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MensagemRetorno'
+        '500':
+          description: Erro interno no servidor
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+  '/operacoes/{uuid}/autorizacao':
+    post:
+      tags:
+        - Operações Financeiras Digitais
+      summary: >-
+        Endpoit para autorizar uma operação financeira digital gerada através do
+        QRPague.
+      description: >-
+        Este endpoint deve ser implementado pela instituição financeira para
+        receber a autorização para realização de uma operação financeira digital
+        gerada através da solução QRPague e identificada pelo seu uuid.
+      operationId: operacao-financeira-autorizar
+      security:
+        - OAuth2: []
+      parameters:
+        - in: path
+          name: uuid
+          description: >-
+            Identificador único da operação financeira na instituição financeira
+            que gerou o QRPague.
+          required: true
+          schema:
+            type: string
+            pattern: >-
+              ^(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}$
+        - $ref: '#/components/parameters/cnpjInstituicao'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AutorizacaoOperacao'
+      responses:
+        '200':
+          description: Requisição realizada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MensagemRetorno'
+        '400':
+          description: Exceção de negócio
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MensagemRetorno'
+        '406':
+          description: >-
+            Exceção de negócio quando atualização de status da operação não for
+            feita corretamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MensagemRetorno'
+        '500':
+          description: Erro interno no servidor
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+  '/operacoes/{uuid}/confirmacao':
+    post:
+      tags:
+        - Operações Financeiras Digitais
+      summary: >-
+        Endpoit para receber a confirmação de execução com sucesso de uma
+        operação financeira digital gerada através do QRPAGUE.
+      description: >-
+        Este endpoint deve ser implementado pela instituição financeira para
+        receber a confirmação da efetivação de uma operação financeira digital
+        gerada através da solução QRPague e identificada pelo seu uuid.
+      operationId: operacao-financeira-confirmar
+      security:
+        - OAuth2: []
+      parameters:
+        - in: path
+          name: uuid
+          description: >-
+            Identificador único da operação financeira na instituição financeira
+            que gerou o QRPague.
+          required: true
+          schema:
+            type: string
+            pattern: >-
+              ^(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}$
+        - $ref: '#/components/parameters/cnpjInstituicao'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfirmacaoOperacao'
+      responses:
+        '200':
+          description: Requisição realizada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MensagemRetorno'
+        '400':
+          description: Exceção de negócio
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MensagemRetorno'
+        '406':
+          description: >-
+            Exceção de negócio quando atualização de status da operação não for
+            feita corretamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MensagemRetorno'
+        '500':
+          description: Erro interno no servidor
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+  '/codigo-barras/{codigoBarras}':
+    get:
+      tags:
+        - Código de Barras
+      summary: >-
+        Endpoit para retornar informações do código de barras do boleto de pagamento do tipo Convênio ou Título.
+      description: >-
+        Este endpoint retorna as informações do código de barras para leitura no mobile banking associado ao QRPague para pagamento do boleto de Convênio ou Título.
+      operationId: codigo-barra-qrcode
+      security:
+        - OAuth2: []
+      parameters:
+        - in: path
+          name: codigoBarras
+          required: true
+          description: >-
+            Identificador númerico do código de barras do título ou convênio, sem espaçadores ou
+            pontos, com 44 dígitos.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Requisição realizada com sucesso
+          content:
+            application/qrpague:
+              schema:
+                $ref: '#/components/schemas/CodigoBarras'
+        '400':
+          description: Exceção de negócio
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MensagemRetorno'
+        '500':
+          description: Erro interno no servidor
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+components:
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: 'https://example.com/oauth/authorize'
+          tokenUrl: 'https://example.com/oauth/token'
+          scopes:
+            read: Grants read access
+            write: Grants write access
+            admin: Grants access to admin operations
+  parameters:
+    cnpjInstituicao:
+      in: header
+      name: cnpjInstituicao
+      description: >-
+        CNPJ Matriz da instituição finaneira que referente à operação financeira
+        digital.
+      required: true
+      schema:
+        type: number
+        format: integer
+  schemas:
+    CodigoBarras:
+      type: object
+      properties:
+        codigoBarras:
+          type: string
+          description: >-
+            Valor dos dígitos do código de barras de 44 dígitos numéricos, para boletos de títulos ou convênios, sem espaçadores, pontos ou traços.
+          example: '12345678912123456781231234567812312345678912'
+      required:
+        - codigoBarras
+    ConsultaOperacaoFinanceira:
+      type: object
+      properties:
+        quantidadeRegistros:
+          type: integer
+          description: >-
+            Quantidade de objetos retornados em uma consulta de operações
+            financeiras.
+          example: 50
+        links:
+          type: array
+          description: >-
+            Links de possíveis ações a serem realizadas no resultado vindo de uma
+            consulta de operações financeiras.
+          items:
+            $ref: '#/components/schemas/Link'
+        resultados:
+          type: array
+          description: >-
+            Conjunto de operações financeiras digitais recuperadas a partir dos
+            parâmetros de filtragem informados.
+          items:
+            $ref: '#/components/schemas/OperacaoFinanceira'
+      required:
+        - quantidadeRegistros
+        - resultados
+    Link:
+      type: object
+      properties:
+        url:
+          type: string
+          description: Código do produto ou serviço para o cliente do QRCode emitido.
+          example: >-
+            <<api.dominio.com.br>>/qrpague/operacoes?paginaInicial=2&tamanhoPagina=20
+        descricao:
+          type: string
+          description: Descrição do link.
+          example: próxima pagina
+        metodoHttp:
+          type: string
+          enum:
+            - POST
+            - GET
+            - PUT
+            - DELETE
+          description: Método http aplicado à URL espeficida.
+          example: GET
+      required:
+        - url
+        - descricao
+        - metodoHttp
+    OperacaoFinanceira:
+      type: object
+      properties:
+        versao:
+          type: number
+          format: float
+          description: Número da versão do formato do JSON especificado.
+          example: 1
+        cnpjInstituicao:
+          type: string
+          description: >-
+            CNPJ da instituição financeira do beneficiário da operação financeira
+            digital.
+          maxLength: 14
+          example: 01234567890123
+        uuid:
+          type: string
+          pattern: >-
+            ^(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}$
+          description: >-
+            Identificador único da operação financeira digital na instituição
+            sacadora. RFC 4122
+          example: 3d0ca315-aff9–4fc2-be61–3b76b9a2d798
+        valor:
+          type: integer
+          description: >-
+            Valor da operação financeira realizada, onde os últimos 2 dígitos são
+            as casas decimais.
+          example: 150000
+        descricao:
+          type: string
+          description: Descrição da operação financeira realizada.
+          example: Pagamento do serviço de Advocacia na Meu escritório de advogados.
+        dataHoraSolicitacao:
+          type: string
+          format: date-time
+          description: >-
+            Data e hora da solicitação da operação financeira na instituição
+            financeira. Formato RFC 3339, seção 5.6.
+          example: '2017-07-21T17:32:28Z'
+        dataHoraVencimento:
+          type: string
+          format: date-time
+          description: >-
+            Data e hora de vencimento da operação financeira na instituição
+            financeira. Formato RFC 3339, seção 5.6.
+          example: '2017-07-21T17:32:28Z'
+        dataHoraEfetivacao:
+          type: string
+          format: date-time
+          description: >-
+            Data e hora de efetivação da operação financeira na instituição
+            financeira. Formato RFC 3339, seção 5.6.
+          example: '2017-07-21T17:32:28Z'
+        tipoOperacao:
+          type: string
+          enum:
+            - SAQUE
+            - TRANSFERENCIA
+            - PAGAMENTO
+          description: Tipo da operação financeira digital realizada.
+          example: PAGAMENTO
+        situacao:
+          type: string
+          enum:
+            - EMITIDO
+            - PAGO
+            - AUTORIZADO
+            - CONFIRMADO
+            - CANCELADO
+          description: Situação da operação financeira digital realizada.
+          example: PAGO
+        terminal:
+          $ref: '#/components/schemas/Terminal'
+        beneficiario:
+          $ref: '#/components/schemas/Beneficiario'
+        itens:
+          type: array
+          items:
+            $ref: '#/components/schemas/Item'
+          description: >-
+            Itens participantes de uma da operação financeira digital gerado para
+            um QRCode.
+        confirmacaoOperacao:
+          $ref: '#/components/schemas/ConfirmacaoOperacao'
+        autorizacaoOperacao:
+          $ref: '#/components/schemas/AutorizacaoOperacao'
+      required:
+        - versao
+        - cnpjInstituicao
+        - valor
+        - dataHoraSolicitacao
+        - situacao
+        - tipoOperacao
+        - terminal
+        - beneficiario
+    Beneficiario:
+      type: object
+      properties:
+        nome:
+          type: string
+          description: Nome do beneficiário na operação financeira digital.
+          example: Meu escritório de advogados
+        cpfCnpj:
+          description: >-
+            Numero do CPF ou CNPJ do Beneficiário da operação financeira digital
+            (incluindo dígito verificador, sem separador)
+          type: string
+          minLength: 11
+          maxLength: 14
+          example: '12345678999'
+        instituicao:
+          type: string
+          description: >-
+            ISQN da instituição do beneficiário na operação financeira digital.
+            Número composto pelos primeiros 8 dígitos do CPNJ da instituição
+            financeira.
+          example: '01234567'
+        agencia:
+          type: string
+          description: >-
+            Agência do beneficiário referente à operação financeira, quando
+            pertinente.
+          example: '1230'
+        conta:
+          type: string
+          description: >-
+            Conta do beneficiário referente à operação financeira incluindo dígito
+            verificador, quando pertinente.
+          example: '222222'
+        operacao:
+          type: string
+          description: >-
+            Operação da conta do beneficiário referente à operação financeira,
+            quando pertinente.
+          example: '51'
+        tipoConta:
+          type: string
+          enum:
+            - CCO
+            - POUP
+          description: >-
+            Tipo da conta do beneficiário referente à operação financeira, quando
+            pertinente.
+          example: POUP
+      required:
+        - nome
+        - cpfCnpj
+        - instituicao
+    Item:
+      type: object
+      properties:
+        descricao48:
+          type: string
+          description: Descrição do produto para impressora de 48 posições.
+          example: Desc resumida produto
+        descricaoCompleta:
+          type: string
+          description: Descrição completa do produto ou serviço consumido.
+          example: >-
+            Descrição mais detalhada do produto que pode extrapolar as 48 posições
+            da descrição resumida.
+        codigo:
+          type: string
+          description: Código do produto ou serviço para o cliente do QRCode emitido.
+          example: xpto-4851-3327
+        quantidade:
+          type: integer
+          description: >-
+            Quantaide de itens do produto ou serviço integrante da operação
+            financeira digital.
+          example: 1
+        valorUnitario:
+          type: integer
+          description: >-
+            Valor unitário do produto ou serviço integrante da operação financeira
+            digital onde os últimos 2 dígitos representam as casas decimais.
+          example: 75000
+        desconto:
+          type: integer
+          description: >-
+            Desconto aplicado ao total do valor da operação financeira digital
+            referente aos seus itens onde os últimos 2 dígitos representam as
+            casas decimais.
+          example: 3500
+        total:
+          type: integer
+          description: >-
+            Total do valor dos itens participantes da operação financeira digital
+            referente do QRCode gerado onde os últimos 2 dígitos representam as
+            casas decimais.
+          example: 71500
+        urlThumbImg:
+          type: string
+          description: >-
+            URL da imagem do item participante da operação financeira digital
+            referente do QRCode gerado.
+          example: <<dominiocliente.com.br>>/prod35/img1.jpg
+      required:
+        - descricaoCompleta
+        - quantidade
+        - valorUnitario
+        - total
+    Terminal:
+      type: object
+      properties:
+        idTerminal:
+          type: string
+          description: Identificador único do terminal na rede da instituição financeira.
+          example: 0001128322332
+        descricao:
+          type: string
+          description: Descrição do terminal na rede da instituição financeira.
+          example: Terminal do super mercado do baixo abc.
+        uf:
+          type: string
+          pattern: '^[A-Z]{2}$'
+          description: >-
+            Sigla da Unidade Federativa do terminal onde o saque está sendo
+            solicitado.
+          example: DF
+        cep:
+          type: string
+          pattern: '^[0-9]{5}-[0-9]{3}$'
+          description: CEP do endereço do terminal onde está sendo solicitado o saque.
+          example: 70000-000
+        latitudeTerminal:
+          type: number
+          format: double
+          description: Latitude em graus do terminal onde está sendo solicitado o saque.
+          example: '-15.7801'
+        longitudeTerminal:
+          type: number
+          format: double
+          description: Longitude em graus do terminal onde está sendo solicitado o saque.
+          example: '-47.9292'
+      required:
+        - idTerminal
+        - descricao
+        - uf
+        - cep
+        - latitudeTerminal
+        - longitudeTerminal
+    ConfirmacaoOperacao:
+      type: object
+      properties:
+        operacaoConfirmada:
+          type: boolean
+          enum:
+            - true
+            - false
+          description: >-
+            Operação financeira confirmada (true). Operação financeira não
+            confirmada (false).
+          example: true
+        dataHoraConfirmacao:
+          type: string
+          format: date-time
+          description: >-
+            Data e hora da confirmação da operação financeira digital na
+            instituição financeira. Formato RFC 3339, seção 5.6.
+          example: '2017-07-21T17:32:28Z'
+        dispositivoConfirmacao:
+          $ref: '#/components/schemas/Terminal'
+          description: Dados do dispositivo que autorizou a operação.
+      required:
+        - operacaoConfirmada
+        - dataHoraConfirmacao
+        - dispositivoConfirmacao
+    AutorizacaoOperacao:
+      type: object
+      properties:
+        operacaoAutorizada:
+          type: boolean
+          enum:
+            - true
+            - false
+          description: >-
+            Operação financeira autorizada (true). Operação financeira não
+            autorizada (false).
+          example: true
+        dataHoraAutorizacao:
+          type: string
+          format: date-time
+          description: >-
+            Data e hora da autorização da operação financeira digital na
+            instituição financeira. Formato RFC 3339, seção 5.6.
+          example: '2017-07-21T17:32:28Z'
+        dispositivoConfirmacao:
+          $ref: '#/components/schemas/Terminal'
+          description: Dados do dispositivo que confirmou a operação.
+      required:
+        - operacaoAutorizada
+        - dataHoraAutorizacao
+        - dispositivoConfirmacao
+    MensagemRetorno:
+      type: object
+      properties:
+        sucessoOperacao:
+          type: boolean
+          enum:
+            - true
+            - false
+          description: >-
+            Operação financeira realizada com sucesso (true). Operação financeira
+            com falha (false).
+          example: true
+        codigoErro:
+          type: number
+          format: integer
+          description: Código de erro de negócio quando houver.
+          example: 1
+        mensagemErro:
+          type: string
+          description: Mensagem de suceosso ou erro da operação.
+          example: QRCode inválido.
+        dataReferencia:
+          description: 'Data hora de referência da transação no formato RFC 3339, seção 5.6.'
+          type: string
+          format: date-time
+          example: '2017-07-21T17:32:28Z'
+        operacaoFinanceira:
+          $ref: '#/components/schemas/OperacaoFinanceira'
+          description: Operação financeira efetuada quando for pertinente.
+      required:
+        - sucessoOperacao
+        - mensagem
+        - dataReferencia
