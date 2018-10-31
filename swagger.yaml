@@ -293,7 +293,7 @@ paths:
       summary: >-
         Endpoit para retornar informações do código de barras do boleto de pagamento do tipo Convênio ou Título.
       description: >-
-        Este endpoint retorna as informações do código de barras para leitura no Mobile Bank associado ao QRPague para pagamento do boleto de Convênio ou Título. 
+        Este endpoint retorna as informações do código de barras para leitura no mobile banking associado ao QRPague para pagamento do boleto de Convênio ou Título.
       operationId: codigo-barra-qrcode
       security:
         - OAuth2: []
@@ -302,7 +302,7 @@ paths:
           name: codigoBarras
           required: true
           description: >-
-            Número do código de barras do boleto a ser pago, sem espaçadores ou
+            Identificador númerico do código de barras do título ou convênio, sem espaçadores ou
             pontos, com 44 dígitos.
           schema:
             type: string
@@ -355,13 +355,6 @@ components:
           description: >-
             Valor dos dígitos do código de barras de 44 dígitos numéricos, para boletos de títulos ou convênios, sem espaçadores, pontos ou traços.
           example: '12345678912123456781231234567812312345678912'
-        tipoBoleto:
-          type: string
-          enum:
-            - TITULO
-            - CONVENIO
-          description: 'Tipo de boleto do código de barras para o valor dos 44 dígitos numéricos.'
-          example: TITULO
       required:
         - codigoBarras
     ConsultaOperacaoFinanceira:
