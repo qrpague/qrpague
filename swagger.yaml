@@ -44,6 +44,10 @@ paths:
               schema:
                 type: string
                 format: binary
+            text/plain:
+              schema:
+                type: string
+                format: url
         '400':
           description: Exceção de negócio
           content:
